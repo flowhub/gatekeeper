@@ -78,7 +78,7 @@ app.all('*', function (req, res, next) {
 });
 
 app.get('/authenticate/:client/:code', function(req, res) {
-  if (!config.clients[client]) {
+  if (!config.clients[req.params.client]) {
     return res.json(404, {
       error: 'unknown_client'
     });
