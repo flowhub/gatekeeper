@@ -79,6 +79,14 @@ Also see the [documentation on Github](http://developer.github.com/v3/oauth/).
    $ node server.js
    ```
 
+## Run tests
+
+There are basic automated tests in `spec/`.
+These can be ran with
+```
+    npm tests
+```
+
 ## Deploy on Heroku
 
 1. Create a new Heroku app
