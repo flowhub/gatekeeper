@@ -7,7 +7,8 @@
     "oauth"
   ],
   "scripts": {
-      "start": "node server.js"
+    "start": "node server.js",
+    "test": "mocha --exit spec/*.js"
   },
   "repository": {
     "type": "git",
@@ -22,5 +23,10 @@
     "node": ">= 0.6.x"
   },
   "main": "index",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "nock": "^13.0.5"
+  }
 }
