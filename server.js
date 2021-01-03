@@ -79,9 +79,17 @@ app.all('*', function (req, res, next) {
 
 function checkRedirect(req, res) {
   const code = req.params.code;
-  const client = req.params.client || "default";
+  var client = req.params.client || "default";
 
   const redirectUrl = process.env.GATEKEEPER_AUTHENTICATE_REDIRECT;
+  const clientRenames = process.env.GATEKEEPER_CLIENT_RENAMES;
+  if (clientRenames) {
+      const renames = JSON.parse(clientRenames);
+      if (renames[client]) {
+          client = renames[client];
+      }
+  }
+
   if (redirectUrl) {
     const url = `${redirectUrl}/${client}/${code}`;
     console.log(`Authenticate for ${client} ${code} redirected to ${url}`);

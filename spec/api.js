@@ -97,8 +97,12 @@ describe('OAuth token exchange', () => {
 
   describe('with redirect enabled', () => {
     const redirectUrl = 'https://other.example.net/pre/fix';
+    const clientRenames = {
+      'default': 'production',
+    }
     before(() => {
       process.env.GATEKEEPER_AUTHENTICATE_REDIRECT = redirectUrl;
+      process.env.GATEKEEPER_CLIENT_RENAMES = JSON.stringify(clientRenames);
     })
     after(() => {
       process.env.GATEKEEPER_AUTHENTICATE_REDIRECT = undefined;
@@ -107,12 +111,15 @@ describe('OAuth token exchange', () => {
     it('should give 302', () => {
         const code = 'validCode';
         const client = 'default';
-        return fetch(authenticateApi+'/'+client+'/'+code, {redirect: 'manual'}).then((res) => {
+        const url = authenticateApi+'/'+client+'/'+code;
+        //const url = authenticateApi+'/'+code;
+        return fetch(url, {redirect: 'manual'}).then((res) => {
             chai.expect(res.status).to.equal(302);
             const location = res.headers.get('location');
             chai.expect(location).to.have.string(redirectUrl);
             chai.expect(location).to.have.string(code);
-            chai.expect(location).to.have.string(client);
+            chai.expect(location).to.not.have.string(client);
+            chai.expect(location).to.have.string(clientRenames[client]);
             return res;
         })
     })
