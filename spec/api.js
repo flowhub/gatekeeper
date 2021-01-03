@@ -95,5 +95,27 @@ describe('OAuth token exchange', () => {
     })
   })
 
+  describe('with redirect enabled', () => {
+    const redirectUrl = 'https://other.example.net/pre/fix';
+    before(() => {
+      process.env.GATEKEEPER_AUTHENTICATE_REDIRECT = redirectUrl;
+    })
+    after(() => {
+      process.env.GATEKEEPER_AUTHENTICATE_REDIRECT = undefined;
+    })
+
+    it('should give 302', () => {
+        const code = 'validCode';
+        const client = 'default';
+        return fetch(authenticateApi+'/'+client+'/'+code, {redirect: 'manual'}).then((res) => {
+            chai.expect(res.status).to.equal(302);
+            const location = res.headers.get('location');
+            chai.expect(location).to.have.string(redirectUrl);
+            chai.expect(location).to.have.string(code);
+            chai.expect(location).to.have.string(client);
+            return res;
+        })
+    })
+  })
 
 })

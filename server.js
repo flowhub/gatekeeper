@@ -77,13 +77,33 @@ app.all('*', function (req, res, next) {
   next();
 });
 
+function checkRedirect(req, res) {
+  const code = req.params.code;
+  const client = req.params.client || "default";
+
+  const redirectUrl = process.env.GATEKEEPER_AUTHENTICATE_REDIRECT;
+  if (redirectUrl) {
+    const url = `${redirectUrl}/${client}/${code}`;
+    console.log(`Authenticate for ${client} ${code} redirected to ${url}`);
+    res.redirect(302, url);
+    return true;
+  }
+  return false;
+}
+
 app.get('/authenticate/:client/:code', function(req, res) {
   if (!config.clients[req.params.client]) {
     return res.json(404, {
       error: 'unknown_client'
     });
   }
+
+  const redirected = checkRedirect(req, res);
+  if (redirected) {
+    return;
+  }
   console.log('authenticating ' + req.params.client + ' code:' + req.params.code);
+
   authenticate(req.params.code, req.params.client, function(err, token) {
     if (err || !token) {
       return res.json(402, {
@@ -96,6 +116,12 @@ app.get('/authenticate/:client/:code', function(req, res) {
   });
 });
 app.get('/authenticate/:code', function(req, res) {
+
+  const redirected = checkRedirect(req, res);
+  if (redirected) {
+    return;
+  }
+
   console.log('authenticating code:' + req.params.code);
   authenticate(req.params.code, 'default', function(err, token) {
     if (err || !token) {
